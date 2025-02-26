@@ -47,8 +47,7 @@ export default function SignUp() {
           <button 
             className="w-full flex items-center justify-center gap-3 bg-white text-gray-800 rounded-lg px-6 py-3.5 font-medium hover:bg-gray-100 transition-all duration-300 hover:scale-[1.02] shadow-lg"
             onClick={() => {
-              // Add your Google sign-in logic here
-              console.log("Google sign-in clicked")
+              router.push('/main')
             }}
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">

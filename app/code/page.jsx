@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Send, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import LoadingSpinner from "./components/LoadingSpinner"
 
 export default function Code() {
   const [code, setCode] = useState("")
@@ -42,7 +43,11 @@ export default function Code() {
     setLoading(false);
   }
 
-  if (!currentProblem) return <div>Loading...</div>;
+  if (!currentProblem) return (
+    <div className="min-h-screen bg-[#0B0C14] flex items-center justify-center">
+      <LoadingSpinner type="initial" />
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-[#0B0C14] text-white flex flex-col">
@@ -95,16 +100,16 @@ export default function Code() {
             <Button 
               className="flex-1 bg-purple-600 hover:bg-purple-700" 
               onClick={handleSubmit}
+              disabled={loading}
             >
-              <Send className="mr-2 h-4 w-4" />
-              Submit Solution
-            </Button>
-            <Button 
-              className="bg-green-600 hover:bg-green-700"
-              onClick={() => console.log("Run code")}
-            >
-              <Play className="mr-2 h-4 w-4" />
-              Run Code
+              {loading ? (
+                <LoadingSpinner type="submission" />
+              ) : (
+                <>
+                  <Send className="mr-2 h-4 w-4" />
+                  Submit Solution
+                </>
+              )}
             </Button>
           </div>
         </div>

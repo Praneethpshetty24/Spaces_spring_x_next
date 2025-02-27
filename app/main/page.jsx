@@ -42,8 +42,23 @@ export default function Page() {
     <div className="min-h-screen bg-[#0B0C14] text-white">
       {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between p-4 border-b border-[#1A1B25]">
-        <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-          Spaces
+        <div className="flex items-center gap-2">
+          <svg 
+            viewBox="0 0 24 24" 
+            className="w-8 h-8 text-purple-500"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+            <path d="M3.29 7L12 12.75 20.71 7" />
+            <path d="M12 22.08V12.75" />
+          </svg>
+          <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+            Spaces
+          </div>
         </div>
         <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
           <Menu className="h-6 w-6" />

@@ -72,10 +72,11 @@ export default function Page() {
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0 fixed md:static top-0 left-0 h-screen md:h-auto z-40 w-80 border-r border-[#1A1B25] bg-[#0B0C14] p-4 transition-transform duration-200 ease-in-out`}
         >
-          <Sidebar />
-          <div className="mt-4">
-            <TweetForm newTweet={newTweet} setNewTweet={setNewTweet} handleTweet={handleTweet} />
-          </div>
+          <Sidebar 
+            newTweet={newTweet}
+            setNewTweet={setNewTweet}
+            handleTweet={handleTweet}
+          />
         </div>
 
         {/* Main Content */}

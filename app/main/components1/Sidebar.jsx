@@ -1,14 +1,21 @@
 "use client"
-import { MessageSquare, Code, User } from "lucide-react"
+import { MessageSquare, Code, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import TweetForm from "./TweetForm"
 
-export default function Sidebar({ className = "" }) {
+export default function Sidebar({ className = "", newTweet, setNewTweet, handleTweet }) {
   const router = useRouter()
 
+  const handleLogout = () => {
+    // You might want to clear any auth tokens/cookies here
+    router.push('/')
+  }
+
   return (
-    <div className={`${className} space-y-4`}>
-      <div className="flex items-center gap-2">
+    <div className={`${className} flex flex-col h-full`}>
+      {/* Logo Section */}
+      <div className="flex items-center gap-2 pb-4 border-b border-[#1A1B25]">
         <svg 
           viewBox="0 0 24 24" 
           className="w-8 h-8 text-purple-500"
@@ -27,7 +34,8 @@ export default function Sidebar({ className = "" }) {
         </div>
       </div>
 
-      <div className="space-y-4">
+      {/* Navigation Section */}
+      <div className="space-y-4 mt-6 flex-1">
         <Button
           variant="ghost"
           className="w-full justify-start text-white hover:bg-[#1A1B25]"
@@ -53,6 +61,27 @@ export default function Sidebar({ className = "" }) {
         >
           <User className="mr-2 h-5 w-5" />
           Profile
+        </Button>
+      </div>
+
+      {/* Tweet Form Section */}
+      <div className="mt-16 pt-4 border-t border-[#1A1B25]">
+        <TweetForm 
+          newTweet={newTweet} 
+          setNewTweet={setNewTweet} 
+          handleTweet={handleTweet} 
+        />
+      </div>
+
+      {/* Logout Section */}
+      <div className="pt-4 border-t border-[#1A1B25]">
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-500/10"
+          onClick={handleLogout}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Logout
         </Button>
       </div>
     </div>

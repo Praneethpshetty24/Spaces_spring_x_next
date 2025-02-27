@@ -1,32 +1,48 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Send, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 
 export default function Code() {
   const [code, setCode] = useState("")
-  const [currentProblem, setCurrentProblem] = useState({
-    id: 1,
-    title: "Two Sum",
-    difficulty: "Easy",
-    description: `Given an array of integers nums and an integer target, return indices of the two numbers in nums such that they add up to target.
+  const [currentProblem, setCurrentProblem] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [feedback, setFeedback] = useState(null)
 
-Example:
-Input: nums = [2,7,11,15], target = 9
-Output: [0,1]
-Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].`,
-    startingCode: `function twoSum(nums, target) {
-    // Write your code here
-    
-}`
-  })
+  useEffect(() => {
+    fetchNewProblem();
+  }, []);
 
-  const handleSubmit = () => {
-    console.log("Submitted code:", code)
-    // Here you would typically send the code to a backend for evaluation
+  const fetchNewProblem = async () => {
+    try {
+      const response = await fetch('/api/question');
+      const problem = await response.json();
+      setCurrentProblem(problem);
+      setCode(problem.startingCode);
+    } catch (error) {
+      console.error('Failed to fetch problem:', error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, problem: currentProblem }),
+      });
+      const result = await response.json();
+      setFeedback(result);
+    } catch (error) {
+      console.error('Submission failed:', error);
+    }
+    setLoading(false);
   }
+
+  if (!currentProblem) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen bg-[#0B0C14] text-white flex flex-col">
@@ -93,6 +109,20 @@ Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].`,
           </div>
         </div>
       </div>
+
+      {/* Add feedback display */}
+      {feedback && (
+        <div className="max-w-4xl mx-auto mt-4 p-4 bg-[#1A1B25] rounded-xl">
+          <h3 className={`text-lg ${feedback.isCorrect ? 'text-green-500' : 'text-red-500'}`}>
+            {feedback.isCorrect ? 'Success!' : 'Not quite right'}
+          </h3>
+          <p className="text-gray-300 mt-2">{feedback.feedback}</p>
+          <div className="mt-2 text-sm text-gray-400">
+            <p>Time Complexity: {feedback.timeComplexity}</p>
+            <p>Space Complexity: {feedback.spaceComplexity}</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

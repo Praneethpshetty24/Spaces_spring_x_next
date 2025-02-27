@@ -2,14 +2,19 @@
 import { MessageSquare, Code, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import { auth } from "@/firebase"
 import TweetForm from "./TweetForm"
 
 export default function Sidebar({ className = "", newTweet, setNewTweet, handleTweet }) {
   const router = useRouter()
 
-  const handleLogout = () => {
-    // You might want to clear any auth tokens/cookies here
-    router.push('/')
+  const handleLogout = async () => {
+    try {
+      await auth.signOut()
+      router.push('/')
+    } catch (error) {
+      console.error('Error logging out:', error)
+    }
   }
 
   return (

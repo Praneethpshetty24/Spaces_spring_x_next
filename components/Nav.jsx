@@ -12,7 +12,7 @@ export default function Nav() {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setIsAuthenticated(!!user)
       if (user) {
-        router.push("/main")
+        router.push("/")
       }
     })
 

@@ -1,9 +1,23 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { auth } from "@/firebase"
+import { useEffect, useState } from "react"
 
 export default function Nav() {
   const router = useRouter()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setIsAuthenticated(!!user)
+      if (user) {
+        router.push("/main")
+      }
+    })
+
+    return () => unsubscribe()
+  }, [router])
 
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-sm border-b border-purple-500/10 bg-[#0B0C14]/75 flex items-center justify-between p-4 lg:p-6">
@@ -26,10 +40,10 @@ export default function Nav() {
         </span>
       </div>
       <button
-        onClick={() => router.push("/sign-up")}
+        onClick={() => router.push(isAuthenticated ? "/main" : "/sign-up")}
         className="px-6 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition-colors"
       >
-        Join Now
+        {isAuthenticated ? "Dashboard" : "Join Now"}
       </button>
     </nav>
   )

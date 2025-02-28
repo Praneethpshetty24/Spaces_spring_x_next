@@ -4,11 +4,13 @@ import { useRouter } from "next/navigation"
 import { Home, User, Settings, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import RouteProtector from "../RouteProtector/page"
 
 export default function Profile() {
   const router = useRouter()
 
   return (
+    <RouteProtector>
     <div className="min-h-screen bg-[#0B0C14] text-white flex">
       {/* Left Sidebar */}
       <div className="w-80 border-r border-[#1A1B25] p-4 space-y-4">
@@ -86,6 +88,7 @@ export default function Profile() {
         </div>
       </div>
     </div>
+    </RouteProtector>
   )
 }
 

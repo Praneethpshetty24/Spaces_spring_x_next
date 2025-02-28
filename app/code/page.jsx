@@ -5,6 +5,7 @@ import { Send, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import LoadingSpinner from "./components/LoadingSpinner"
+import RouteProtector from "../RouteProtector/page"
 
 export default function Code() {
   const [code, setCode] = useState("")
@@ -50,7 +51,7 @@ export default function Code() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0B0C14] text-white flex flex-col">
+    <RouteProtector>    <div className="min-h-screen bg-[#0B0C14] text-white flex flex-col">
       {/* Problem Description */}
       <div className="border-b border-[#1A1B25] p-6">
         <div className="max-w-4xl mx-auto">
@@ -129,5 +130,7 @@ export default function Code() {
         </div>
       )}
     </div>
+    </RouteProtector>
+
   )
 }

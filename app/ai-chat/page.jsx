@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import RouteProtector from "../RouteProtector/page"
 
 export default function AiChat() {
   const [messages, setMessages] = useState([{ id: 1, text: "Hello! How can I assist you today?", isAi: true }])
@@ -53,6 +54,7 @@ export default function AiChat() {
     "bg-gradient-to-br from-purple-600 to-indigo-700"} p-4 rounded-2xl space-y-3 max-w-[85%] shadow-lg`
 
   return (
+    <RouteProtector>
     <div className="h-screen flex flex-col bg-gradient-to-b from-[#0B0C14] to-[#13141F] text-white">
       <div className="border-b border-[#1A1B25] p-4 backdrop-blur-md bg-[#0B0C14]/80 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -125,5 +127,6 @@ export default function AiChat() {
         </div>
       </div>
     </div>
+    </RouteProtector>
   )
 }

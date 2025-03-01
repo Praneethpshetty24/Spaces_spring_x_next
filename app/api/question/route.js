@@ -10,6 +10,7 @@ export async function GET() {
       "- Title\n- Difficulty (Easy/Medium/Hard)\n" +
       "- Description with example input/output\n" +
       "- Starting code template in JavaScript\n" +
+      "- Tell them where they can improve\n" +
       "Make it similar to LeetCode style problems.";
 
     const result = await model.generateContent(prompt);

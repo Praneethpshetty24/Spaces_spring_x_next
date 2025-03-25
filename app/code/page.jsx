@@ -109,18 +109,18 @@ export default function CodeChallenge() {
                   spellCheck="false"
                 />
 
-                {/* Action Buttons */}
+              {/* Action Buttons */}
                 <div className="p-3 border-t border-[#2A2B3A]">
                   <Button className="w-full bg-purple-600 hover:bg-purple-700" onClick={handleSubmit} disabled={loading}>
-                    {loading ? (
-                      <LoadingSpinner type="submission" />
-                    ) : (
-                      <>
-                        <Send className="mr-2 h-4 w-4" />
-                        Submit Solution
-                      </>
-                    )}
-                  </Button>
+                  {loading ? (
+                    <LoadingSpinner type="submission" />
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      Submit Solution
+                    </>
+                  )}
+                </Button>
                 </div>
               </div>
             </div>
@@ -137,8 +137,8 @@ export default function CodeChallenge() {
                       <XCircle className="h-5 w-5 text-red-500 mr-2" />
                     )}
                     <h3 className="text-base md:text-lg font-medium">
-                      {feedback.isCorrect ? "Success!" : "Not quite right"}
-                    </h3>
+                  {feedback.isCorrect ? "Success!" : "Not quite right"}
+                </h3>
                   </div>
                   
                   {/* Feedback Content */}
@@ -260,9 +260,9 @@ export default function CodeChallenge() {
                       Your code will be evaluated for correctness, time and space complexity, 
                       and code quality metrics.
                     </p>
-                  </div>
                 </div>
-              )}
+              </div>
+            )}
             </div>
           </div>
         </div>

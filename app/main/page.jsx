@@ -8,6 +8,7 @@ import TweetForm from "./components1/TweetForm"
 import TweetList from "./components1/TweetList"
 import RouteProtector from "../RouteProtector/page"
 import supabase from '@/supabase'
+import { getAuth } from 'firebase/auth'
 
 export default function Page() {
   const [tweets, setTweets] = useState([])
@@ -15,9 +16,17 @@ export default function Page() {
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState("")
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
+    const auth = getAuth()
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUser(user)
+      }
+    })
     fetchTweets()
+    return () => unsubscribe()
   }, [])
 
   const fetchTweets = async () => {
@@ -26,20 +35,35 @@ export default function Page() {
       .select('*')
       .order('created_at', { ascending: false })
     
+    console.log("Fetched tweets:", data) // Debug log
     if (data) setTweets(data)
   }
 
   const handleTweet = async () => {
-    if (newTweet.trim()) {
-      const { data, error } = await supabase
-        .from('tweets')
-        .insert([{ text: newTweet }])
-        .select()
+    if (!user || !newTweet.trim()) return
 
-      if (data) {
-        setTweets([data[0], ...tweets])
-        setNewTweet("")
-      }
+    const tweetData = {
+      text: newTweet,
+      username: user.displayName || user.email?.split('@')[0] || 'Anonymous',
+      user_id: user.uid
+    }
+    
+    console.log("Sending tweet data:", tweetData) // Debug log
+
+    const { data, error } = await supabase
+      .from('tweets')
+      .insert([tweetData])
+      .select()
+
+    if (error) {
+      console.error("Error creating tweet:", error) // Debug log
+      return
+    }
+
+    if (data) {
+      console.log("Created tweet:", data[0]) // Debug log
+      setTweets([data[0], ...tweets])
+      setNewTweet("")
     }
   }
 
@@ -124,6 +148,7 @@ export default function Page() {
               handleEdit={handleEdit}
               saveEdit={saveEdit}
               handleDelete={handleDelete}
+              currentUserId={user?.uid}
             />
           </div>
         </div>

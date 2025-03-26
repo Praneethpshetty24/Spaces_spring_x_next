@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-export default function TweetList({ tweets, editingId, editText, setEditText, handleEdit, saveEdit, handleDelete }) {
+export default function TweetList({ tweets, editingId, editText, setEditText, handleEdit, saveEdit, handleDelete, currentUserId }) {
   return (
     <div className="max-w-3xl space-y-4">
       {tweets.map((tweet) => (
@@ -12,31 +12,35 @@ export default function TweetList({ tweets, editingId, editText, setEditText, ha
             <div className="flex items-center space-x-3">
               <Avatar>
                 <AvatarImage src="/placeholder.svg" />
-                <AvatarFallback>UN</AvatarFallback>
+                <AvatarFallback>{tweet.username?.slice(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div>
-                <div className="font-semibold">User Name</div>
-                <div className="text-sm text-gray-400">{tweet.timestamp}</div>
+                <div className="font-semibold">{tweet.username}</div>
+                <div className="text-sm text-gray-400">
+                  {new Date(tweet.created_at).toLocaleString()}
+                </div>
               </div>
             </div>
-            <div className="flex space-x-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleEdit(tweet.id, tweet.text)}
-                className="text-gray-400 hover:text-purple-400"
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleDelete(tweet.id)}
-                className="text-gray-400 hover:text-red-400"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
+            {currentUserId === tweet.user_id && (
+              <div className="flex space-x-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleEdit(tweet.id, tweet.text)}
+                  className="text-gray-400 hover:text-purple-400"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleDelete(tweet.id)}
+                  className="text-gray-400 hover:text-red-400"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
 
           {editingId === tweet.id ? (

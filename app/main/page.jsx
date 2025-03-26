@@ -1,27 +1,45 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Sidebar from "./components1/Sidebar"
 import TweetForm from "./components1/TweetForm"
 import TweetList from "./components1/TweetList"
 import RouteProtector from "../RouteProtector/page"
+import supabase from '@/supabase'
 
 export default function Page() {
-  const [tweets, setTweets] = useState([
-    { id: 1, text: "Just deployed my first Next.js app! 🚀", timestamp: "2 hours ago" },
-    { id: 2, text: "Learning about Server Components and loving it!", timestamp: "5 hours ago" },
-  ])
+  const [tweets, setTweets] = useState([])
   const [newTweet, setNewTweet] = useState("")
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState("")
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  const handleTweet = () => {
+  useEffect(() => {
+    fetchTweets()
+  }, [])
+
+  const fetchTweets = async () => {
+    const { data, error } = await supabase
+      .from('tweets')
+      .select('*')
+      .order('created_at', { ascending: false })
+    
+    if (data) setTweets(data)
+  }
+
+  const handleTweet = async () => {
     if (newTweet.trim()) {
-      setTweets([{ id: Date.now(), text: newTweet, timestamp: "Just now" }, ...tweets])
-      setNewTweet("")
+      const { data, error } = await supabase
+        .from('tweets')
+        .insert([{ text: newTweet }])
+        .select()
+
+      if (data) {
+        setTweets([data[0], ...tweets])
+        setNewTweet("")
+      }
     }
   }
 
@@ -30,13 +48,28 @@ export default function Page() {
     setEditText(text)
   }
 
-  const saveEdit = (id) => {
-    setTweets(tweets.map((tweet) => (tweet.id === id ? { ...tweet, text: editText } : tweet)))
-    setEditingId(null)
+  const saveEdit = async (id) => {
+    const { data, error } = await supabase
+      .from('tweets')
+      .update({ text: editText })
+      .eq('id', id)
+      .select()
+
+    if (data) {
+      setTweets(tweets.map((tweet) => (tweet.id === id ? data[0] : tweet)))
+      setEditingId(null)
+    }
   }
 
-  const handleDelete = (id) => {
-    setTweets(tweets.filter((tweet) => tweet.id !== id))
+  const handleDelete = async (id) => {
+    const { error } = await supabase
+      .from('tweets')
+      .delete()
+      .eq('id', id)
+
+    if (!error) {
+      setTweets(tweets.filter((tweet) => tweet.id !== id))
+    }
   }
 
   return (

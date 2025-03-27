@@ -13,8 +13,6 @@ import { getAuth } from 'firebase/auth'
 export default function Page() {
   const [tweets, setTweets] = useState([])
   const [newTweet, setNewTweet] = useState("")
-  const [editingId, setEditingId] = useState(null)
-  const [editText, setEditText] = useState("")
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [user, setUser] = useState(null)
 
@@ -67,35 +65,6 @@ export default function Page() {
     }
   }
 
-  const handleEdit = (id, text) => {
-    setEditingId(id)
-    setEditText(text)
-  }
-
-  const saveEdit = async (id) => {
-    const { data, error } = await supabase
-      .from('tweets')
-      .update({ text: editText })
-      .eq('id', id)
-      .select()
-
-    if (data) {
-      setTweets(tweets.map((tweet) => (tweet.id === id ? data[0] : tweet)))
-      setEditingId(null)
-    }
-  }
-
-  const handleDelete = async (id) => {
-    const { error } = await supabase
-      .from('tweets')
-      .delete()
-      .eq('id', id)
-
-    if (!error) {
-      setTweets(tweets.filter((tweet) => tweet.id !== id))
-    }
-  }
-
   return (
     <RouteProtector>
       <div className="min-h-screen bg-[#0B0C14] text-white">
@@ -140,16 +109,7 @@ export default function Page() {
 
           {/* Main Content */}
           <div className="flex-1 p-4 md:ml-0">
-            <TweetList
-              tweets={tweets}
-              editingId={editingId}
-              editText={editText}
-              setEditText={setEditText}
-              handleEdit={handleEdit}
-              saveEdit={saveEdit}
-              handleDelete={handleDelete}
-              currentUserId={user?.uid}
-            />
+            <TweetList tweets={tweets} />
           </div>
         </div>
 

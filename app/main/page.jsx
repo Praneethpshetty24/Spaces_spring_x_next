@@ -1,10 +1,8 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Sidebar from "./components1/Sidebar"
-import TweetForm from "./components1/TweetForm"
 import TweetList from "./components1/TweetList"
 import RouteProtector from "../RouteProtector/page"
 import supabase from '@/supabase'
@@ -15,53 +13,104 @@ export default function Page() {
   const [newTweet, setNewTweet] = useState("")
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [user, setUser] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [likedTweets, setLikedTweets] = useState(new Set())
 
   useEffect(() => {
     const auth = getAuth()
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUser(user)
-      }
-    })
+    auth.onAuthStateChanged(user => user && setUser(user))
     fetchTweets()
-    return () => unsubscribe()
   }, [])
 
+  useEffect(() => {
+    if (user) {
+      fetchUserLikes()
+    }
+  }, [user])
+
   const fetchTweets = async () => {
-    const { data, error } = await supabase
-      .from('tweets')
-      .select('*')
-      .order('created_at', { ascending: false })
+    const { data } = await supabase.from('tweets').select('*').order('created_at', { ascending: false })
+    data && setTweets(data)
+  }
+
+  const fetchUserLikes = async () => {
+    if (!user) return
+    const { data } = await supabase
+      .from('tweet_likes')
+      .select('tweet_id')
+      .eq('user_id', user.uid)
     
-    console.log("Fetched tweets:", data) // Debug log
-    if (data) setTweets(data)
+    setLikedTweets(new Set(data?.map(like => like.tweet_id)))
   }
 
   const handleTweet = async () => {
     if (!user || !newTweet.trim()) return
-
-    const tweetData = {
-      text: newTweet,
-      username: user.displayName || user.email?.split('@')[0] || 'Anonymous',
-      user_id: user.uid
+    setIsLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('tweets')
+        .insert([{
+          text: newTweet.trim(),
+          username: user.displayName || user.email?.split('@')[0] || 'Anonymous',
+          user_id: user.uid,
+          likes: 0
+        }])
+        .select()
+      if (error) throw error
+      if (data?.[0]) {
+        setTweets([data[0], ...tweets])
+        setNewTweet("")
+      }
+    } catch (error) {
+      console.error("Tweet error:", error)
+    } finally {
+      setIsLoading(false)
     }
-    
-    console.log("Sending tweet data:", tweetData) // Debug log
+  }
 
-    const { data, error } = await supabase
-      .from('tweets')
-      .insert([tweetData])
-      .select()
+  const handleLike = async (tweetId) => {
+    if (!user) return
+    try {
+      const isLiked = likedTweets.has(tweetId)
+      if (isLiked) {
+        // Unlike
+        await supabase
+          .from('tweet_likes')
+          .delete()
+          .eq('user_id', user.uid)
+          .eq('tweet_id', tweetId)
+        
+        await supabase
+          .from('tweets')
+          .update({ likes: tweets.find(t => t.id === tweetId).likes - 1 })
+          .eq('id', tweetId)
 
-    if (error) {
-      console.error("Error creating tweet:", error) // Debug log
-      return
-    }
+        setLikedTweets(prev => {
+          const next = new Set(prev)
+          next.delete(tweetId)
+          return next
+        })
+      } else {
+        // Like
+        await supabase
+          .from('tweet_likes')
+          .insert({ user_id: user.uid, tweet_id: tweetId })
 
-    if (data) {
-      console.log("Created tweet:", data[0]) // Debug log
-      setTweets([data[0], ...tweets])
-      setNewTweet("")
+        await supabase
+          .from('tweets')
+          .update({ likes: tweets.find(t => t.id === tweetId).likes + 1 })
+          .eq('id', tweetId)
+
+        setLikedTweets(prev => new Set([...prev, tweetId]))
+      }
+
+      setTweets(tweets.map(t => 
+        t.id === tweetId 
+          ? { ...t, likes: t.likes + (isLiked ? -1 : 1) }
+          : t
+      ))
+    } catch (error) {
+      console.error("Like error:", error)
     }
   }
 
@@ -95,31 +144,18 @@ export default function Page() {
 
         <div className="flex">
           {/* Sidebar */}
-          <div
-            className={`${
-              isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-            } md:translate-x-0 fixed md:static top-0 left-0 h-screen md:h-auto z-40 w-80 border-r border-[#1A1B25] bg-[#0B0C14] p-4 transition-transform duration-200 ease-in-out`}
-          >
-            <Sidebar 
-              newTweet={newTweet}
-              setNewTweet={setNewTweet}
-              handleTweet={handleTweet}
-            />
+          <div className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 fixed md:static top-0 left-0 h-screen md:h-auto z-40 w-80 border-r border-[#1A1B25] bg-[#0B0C14] p-4 transition-transform duration-200`}>
+            <Sidebar newTweet={newTweet} setNewTweet={setNewTweet} handleTweet={handleTweet} isLoading={isLoading} />
           </div>
 
           {/* Main Content */}
           <div className="flex-1 p-4 md:ml-0">
-            <TweetList tweets={tweets} />
+            <TweetList tweets={tweets} onLike={handleLike} currentUser={user} likedTweets={likedTweets} />
           </div>
         </div>
 
         {/* Overlay */}
-        {isSidebarOpen && (
-          <div
-            className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
+        {isSidebarOpen && <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30" onClick={() => setIsSidebarOpen(false)} />}
       </div>
     </RouteProtector>
   )

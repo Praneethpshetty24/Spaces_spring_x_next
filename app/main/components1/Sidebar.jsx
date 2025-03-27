@@ -1,5 +1,5 @@
 "use client"
-import { MessageSquare, Code, User, LogOut } from "lucide-react"
+import { MessageSquare, Code, User, LogOut, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { auth } from "@/firebase"
@@ -48,6 +48,15 @@ export default function Sidebar({ className = "", newTweet, setNewTweet, handleT
         >
           <MessageSquare className="mr-2 h-5 w-5" />
           AI Chat
+        </Button>
+
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-white hover:bg-[#1A1B25]"
+          onClick={() => router.push("/community")}
+        >
+          <Users className="mr-2 h-5 w-5" />
+          Community
         </Button>
 
         <Button

@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { Menu } from "lucide-react"
+import { Menu, ArrowUp } from "lucide-react"  // Add ArrowUp import
 import { Button } from "@/components/ui/button"
 import Sidebar from "./components1/Sidebar"
 import TweetList from "./components1/TweetList"
@@ -15,6 +15,7 @@ export default function Page() {
   const [user, setUser] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [likedTweets, setLikedTweets] = useState(new Set())
+  const [showScrollTop, setShowScrollTop] = useState(false)
 
   useEffect(() => {
     const auth = getAuth()
@@ -27,6 +28,15 @@ export default function Page() {
       fetchUserLikes()
     }
   }, [user])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const fetchTweets = async () => {
     const { data } = await supabase.from('tweets').select('*').order('created_at', { ascending: false })
@@ -114,6 +124,10 @@ export default function Page() {
     }
   }
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
     <RouteProtector>
       <div className="min-h-screen bg-[#0B0C14] text-white">
@@ -156,6 +170,18 @@ export default function Page() {
 
         {/* Overlay */}
         {isSidebarOpen && <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30" onClick={() => setIsSidebarOpen(false)} />}
+
+        {/* Scroll to Top Button */}
+        {showScrollTop && (
+          <Button
+            variant="secondary"
+            size="icon"
+            className="fixed bottom-8 right-8 rounded-full bg-purple-500 hover:bg-purple-600 z-50"
+            onClick={scrollToTop}
+          >
+            <ArrowUp className="h-5 w-5" />
+          </Button>
+        )}
       </div>
     </RouteProtector>
   )

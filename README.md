@@ -20,4 +20,4 @@ Spaces is a learning platform designed for aspiring software engineers, featurin
 
 ---
 
-Empowering the next generation of software engineers!
+🚀 *Empowering the next generation of software engineers!* 💡

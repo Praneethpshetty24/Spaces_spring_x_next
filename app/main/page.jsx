@@ -1,9 +1,10 @@
 "use client"
 import { useState, useEffect } from "react"
-import { Menu, ArrowUp } from "lucide-react"  // Add ArrowUp import
+import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Sidebar from "./components1/Sidebar"
 import TweetList from "./components1/TweetList"
+import TweetForm from "./components1/TweetForm"
 import RouteProtector from "../RouteProtector/page"
 import supabase from '@/supabase'
 import { getAuth } from 'firebase/auth'
@@ -131,41 +132,58 @@ export default function Page() {
   return (
     <RouteProtector>
       <div className="min-h-screen bg-[#0B0C14] text-white">
-        {/* Mobile Header */}
-        <div className="md:hidden flex items-center justify-between p-4 border-b border-[#1A1B25]">
-          <div className="flex items-center gap-2">
-            <svg 
-              viewBox="0 0 24 24" 
-              className="w-8 h-8 text-purple-500"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-              <path d="M3.29 7L12 12.75 20.71 7" />
-              <path d="M12 22.08V12.75" />
-            </svg>
-            <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-              Spaces
+        {/* Header */}
+        <header className="fixed top-0 left-0 right-0 h-16 bg-[#0B0C14]/80 backdrop-blur-md border-b border-[#1A1B25] z-50">
+          <div className="h-full max-w-screen-2xl mx-auto px-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <svg 
+                viewBox="0 0 24 24" 
+                className="w-8 h-8 text-purple-500"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <path d="M3.29 7L12 12.75 20.71 7" />
+                <path d="M12 22.08V12.75" />
+              </svg>
+              <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                Spaces
+              </div>
             </div>
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+              <Menu className="h-6 w-6" />
+            </Button>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-            <Menu className="h-6 w-6" />
-          </Button>
-        </div>
+        </header>
 
-        <div className="flex">
+        <div className="flex pt-16">
           {/* Sidebar */}
-          <div className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 fixed md:static top-0 left-0 h-screen md:h-auto z-40 w-80 border-r border-[#1A1B25] bg-[#0B0C14] p-4 transition-transform duration-200`}>
-            <Sidebar newTweet={newTweet} setNewTweet={setNewTweet} handleTweet={handleTweet} isLoading={isLoading} />
+          <div className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 fixed md:sticky top-16 left-0 h-[calc(100vh-4rem)] w-80 border-r border-[#1A1B25] bg-[#0B0C14] p-4 transition-transform duration-200 z-40`}>
+            <Sidebar />
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 p-4 md:ml-0">
-            <TweetList tweets={tweets} onLike={handleLike} currentUser={user} likedTweets={likedTweets} />
-          </div>
+          <main className="flex-1 min-h-[calc(100vh-4rem)]">
+            <div className="max-w-3xl mx-auto px-3 md:px-4 py-4 md:py-8">
+              <TweetForm 
+                newTweet={newTweet}
+                setNewTweet={setNewTweet}
+                handleTweet={handleTweet}
+                isLoading={isLoading}
+              />
+              <div className="space-y-4 md:space-y-6">
+                <TweetList 
+                  tweets={tweets} 
+                  onLike={handleLike} 
+                  currentUser={user} 
+                  likedTweets={likedTweets} 
+                />
+              </div>
+            </div>
+          </main>
         </div>
 
         {/* Overlay */}
@@ -179,7 +197,19 @@ export default function Page() {
             className="fixed bottom-8 right-8 rounded-full bg-purple-500 hover:bg-purple-600 z-50"
             onClick={scrollToTop}
           >
-            <ArrowUp className="h-5 w-5" />
+            <svg 
+              viewBox="0 0 24 24" 
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              <path d="M3.29 7L12 12.75 20.71 7" />
+              <path d="M12 22.08V12.75" />
+            </svg>
           </Button>
         )}
       </div>

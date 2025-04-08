@@ -75,9 +75,20 @@ export default function CodeChallenge() {
         <div className="border-b border-[#1A1B25] p-4 md:p-6">
           <div className="w-full max-w-[1440px] mx-auto px-2">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-xl md:text-2xl font-bold">{currentProblem.title}</h1>
+              <h1 className="text-xl md:text-2xl font-bold">Coding Question</h1>
             </div>
-            <pre className="whitespace-pre-wrap text-gray-300 font-normal text-sm md:text-base">{currentProblem.description}</pre>
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-lg font-semibold mb-2">Question:</h2>
+                <p className="text-gray-300">{currentProblem.question}</p>
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold mb-2">Example:</h2>
+                <pre className="bg-[#22233A] p-3 rounded-lg text-gray-300 font-mono text-sm">
+                  {currentProblem.example}
+                </pre>
+              </div>
+            </div>
           </div>
         </div>
 

@@ -6,7 +6,6 @@ import Sidebar from "./components1/Sidebar"
 import TweetList from "./components1/TweetList"
 import TweetForm from "./components1/TweetForm"
 import RouteProtector from "../RouteProtector/page"
-import supabase from '@/supabase'
 import { getAuth } from 'firebase/auth'
 
 export default function Page() {
@@ -40,17 +39,15 @@ export default function Page() {
   }, [])
 
   const fetchTweets = async () => {
-    const { data } = await supabase.from('tweets').select('*').order('created_at', { ascending: false })
+    const response = await fetch('/api/tweets')
+    const data = await response.json()
     data && setTweets(data)
   }
 
   const fetchUserLikes = async () => {
     if (!user) return
-    const { data } = await supabase
-      .from('tweet_likes')
-      .select('tweet_id')
-      .eq('user_id', user.uid)
-    
+    const response = await fetch(`/api/tweets/likes?userId=${user.uid}`)
+    const data = await response.json()
     setLikedTweets(new Set(data?.map(like => like.tweet_id)))
   }
 
@@ -58,18 +55,18 @@ export default function Page() {
     if (!user || !newTweet.trim()) return
     setIsLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('tweets')
-        .insert([{
+      const response = await fetch('/api/tweets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           text: newTweet.trim(),
           username: user.displayName || user.email?.split('@')[0] || 'Anonymous',
-          user_id: user.uid,
-          likes: 0
-        }])
-        .select()
-      if (error) throw error
-      if (data?.[0]) {
-        setTweets([data[0], ...tweets])
+          user_id: user.uid
+        })
+      })
+      const data = await response.json()
+      if (data) {
+        setTweets([data, ...tweets])
         setNewTweet("")
       }
     } catch (error) {
@@ -83,43 +80,33 @@ export default function Page() {
     if (!user) return
     try {
       const isLiked = likedTweets.has(tweetId)
-      if (isLiked) {
-        // Unlike
-        await supabase
-          .from('tweet_likes')
-          .delete()
-          .eq('user_id', user.uid)
-          .eq('tweet_id', tweetId)
-        
-        await supabase
-          .from('tweets')
-          .update({ likes: tweets.find(t => t.id === tweetId).likes - 1 })
-          .eq('id', tweetId)
+      const response = await fetch('/api/tweets/likes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tweet_id: tweetId,
+          user_id: user.uid,
+          isLiked
+        })
+      })
 
+      if (response.ok) {
         setLikedTweets(prev => {
           const next = new Set(prev)
-          next.delete(tweetId)
+          if (isLiked) {
+            next.delete(tweetId)
+          } else {
+            next.add(tweetId)
+          }
           return next
         })
-      } else {
-        // Like
-        await supabase
-          .from('tweet_likes')
-          .insert({ user_id: user.uid, tweet_id: tweetId })
 
-        await supabase
-          .from('tweets')
-          .update({ likes: tweets.find(t => t.id === tweetId).likes + 1 })
-          .eq('id', tweetId)
-
-        setLikedTweets(prev => new Set([...prev, tweetId]))
+        setTweets(tweets.map(t => 
+          t.id === tweetId 
+            ? { ...t, likes: t.likes + (isLiked ? -1 : 1) }
+            : t
+        ))
       }
-
-      setTweets(tweets.map(t => 
-        t.id === tweetId 
-          ? { ...t, likes: t.likes + (isLiked ? -1 : 1) }
-          : t
-      ))
     } catch (error) {
       console.error("Like error:", error)
     }

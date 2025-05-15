@@ -13,7 +13,7 @@ function cleanJsonResponse(text) {
 export async function POST(request) {
   try {
     const { code, problem } = await request.json();
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const prompt = `Evaluate this code solution. Respond with ONLY a JSON object - no markdown, no code blocks, no additional text.
 

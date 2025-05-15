@@ -4,7 +4,7 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 export async function GET() {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     
     const prompt = "Generate a coding question with the following format:\n" +
       "Question: [A clear, concise programming question]\n" +

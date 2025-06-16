@@ -3,6 +3,7 @@
 Spaces is a learning platform designed for aspiring software engineers, featuring AI-powered assistance to enhance coding skills and understanding of software development.
 
 ## 🚀 Features
+https://www.praneethp.xyz/blog/projects/project2 - Detailed Blog
 
 - **📄 Blog Page** – Provides software engineering tips and insights.
 - **💬 Community Chat** – Connect with peers for collaboration and knowledge sharing.
